@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { CrudModule } from './crud/crud.module';
 
 @Module({
-  imports: [],
+  imports: [TypeOrmModule.forRoot(), CrudModule],
   controllers: [],
   providers: [],
 })
