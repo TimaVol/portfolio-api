@@ -5,6 +5,7 @@
   "username": "postgres",
   "password": "postgres",
   "database": "portfolio",
+  "synchronize": true,
   "entities": ["dist/**/*.entity{.ts,.js}"],
-  "synchronize": true
+  "autoLoadEntities": true
 }
