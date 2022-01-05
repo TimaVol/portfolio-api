@@ -22,16 +22,18 @@ export class CrudController {
     private readonly authService: AuthService,
   ) {}
 
-  @Post()
-  create(@Body() createWorkDto: CreateWorkDto): Promise<Work> {
-    return this.crudService.create(createWorkDto);
-  }
-
   @Get()
   getAll(): Promise<Work[]> {
     return this.crudService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  create(@Body() createWorkDto: CreateWorkDto): Promise<Work> {
+    return this.crudService.create(createWorkDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   delete(@Param('id') id: string): Promise<void> {
     return this.crudService.remove(id);
@@ -43,7 +45,6 @@ export class CrudController {
     return this.authService.login(req.user);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;
