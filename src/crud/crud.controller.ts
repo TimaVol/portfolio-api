@@ -7,12 +7,18 @@ import {
   Post,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import * as path from 'path';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/auth/guards/local-auth.guard';
 import { CrudService } from './crud.service';
 import { CreateWorkDto } from './dto/create-work.dto';
+import { editFileName, imageFileFilter } from './utils/file-uploading.utils';
 import { Work } from './work.entity';
 
 @Controller('crud')
@@ -29,8 +35,26 @@ export class CrudController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createWorkDto: CreateWorkDto): Promise<Work> {
-    return this.crudService.create(createWorkDto);
+  @UseInterceptors(
+    FileInterceptor('img', {
+      storage: diskStorage({
+        destination: path.resolve(__dirname, '..', 'static'),
+        filename: editFileName,
+      }),
+      fileFilter: imageFileFilter,
+    }),
+  )
+  create(
+    @Body() createWorkDto: CreateWorkDto,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<Work> {
+    const response = {
+      originalname: file.originalname,
+      filename: file.filename,
+      file,
+    };
+
+    return this.crudService.create(createWorkDto, response.filename);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -44,9 +68,8 @@ export class CrudController {
   login(@Request() req) {
     return this.authService.login(req.user);
   }
-
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
-  }
 }
+// @Get(':imgpath')
+// seeUploadedFile(@Param('imgpath') image, @Res() res) {
+//   return res.sendFile(image, { root: './files' });
+// }

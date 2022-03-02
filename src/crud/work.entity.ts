@@ -13,4 +13,7 @@ export class Work {
 
   @Column()
   link: string;
+
+  @Column()
+  img: string;
 }
