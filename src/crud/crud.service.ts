@@ -11,12 +11,12 @@ export class CrudService {
     private worksRepository: Repository<Work>,
   ) {}
 
-  create(createWorkDto: CreateWorkDto): Promise<Work> {
+  create(createWorkDto: CreateWorkDto, imgTitle: string): Promise<Work> {
     const work = new Work();
     work.title = createWorkDto.title;
     work.description = createWorkDto.description;
     work.link = createWorkDto.link;
-
+    work.img = imgTitle;
     return this.worksRepository.save(work);
   }
 
