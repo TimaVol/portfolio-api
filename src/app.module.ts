@@ -8,12 +8,24 @@ import * as path from 'path';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [
-        `${process.cwd()}/config/.env.development`,
-        `${process.cwd()}/config/.env.prodaction`,
-      ],
+      envFilePath: `${process.cwd()}/config/.${process.env.NODE_ENV}.env`,
     }),
-    TypeOrmModule.forRoot(),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.BD_HOST,
+      port: Number(process.env.BD_PORT),
+      username: process.env.BD_USERNAME,
+      password: process.env.BD_PASSWORD,
+      database: process.env.BD_DATABASE,
+      synchronize: true,
+      entities: ['dist/**/*.entity{.ts,.js}'],
+      autoLoadEntities: true,
+      migrationsTableName: 'custom_migration_table',
+      migrations: ['migration/*.js'],
+      cli: {
+        migrationsDir: 'migration',
+      },
+    }),
     ServeStaticModule.forRoot({
       rootPath: path.resolve(__dirname, 'static'),
     }),
